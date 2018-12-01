@@ -1,6 +1,9 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
-public class wordAligner {
+public class wordAligner implements Alignment {
 	String[] words1;
 	String[] words2;
 	
@@ -8,14 +11,15 @@ public class wordAligner {
 	ArrayList<String> words2Corrected = new ArrayList<String>();
 	int[][] scoringMatrix;
 	String[][] traverseMatrix;
-	int gapPenalty = -5; // penalty for inserting '_'
-	int alignmentScore = 3; // score for matching identical strings
 	int similarScore = 1; // score for matching similar strings
-	final int SCORE = -10000; // initial value for scoring matrix
+	String filename1;
+	String filename2;
 
-	public wordAligner(String filename1, String filename2) {
-		FileReader fr = new FileReader(filename1);
-		FileReader fr2 = new FileReader(filename2);
+	public wordAligner(String file1, String file2) {
+		FileReader fr = new FileReader(file1);
+		FileReader fr2 = new FileReader(file2);
+		filename1 = fr.getFileName()+"_";
+		filename2 = fr2.getFileName()+".csv"; // save as comma separated value files for excel
 
 		words1 = fr.getWords();
 		words2 = fr2.getWords();
@@ -47,10 +51,11 @@ public class wordAligner {
 		fillScoringMatrix(words1.length-1, words2.length-1);
 		traverseScoreMatrixBackwards();
 		alignWords();
-		printAlignment();
+	//	System.out.println("******************");
+		printAlignmentToFile();
 	}
 	
-	private int fillScoringMatrix(int i, int j){
+	public int fillScoringMatrix(int i, int j){
 		//	System.out.println("i is "+i+ " and j is "+j);
 		//	System.out.println("scoring matrix at i,j is "+scoringMatrix[i][j]);
 
@@ -91,7 +96,7 @@ public class wordAligner {
 
 	}
 	
-	void traverseScoreMatrixBackwards() {
+	public void traverseScoreMatrixBackwards() {
 		//indices
 		int i,j;
 		i = words1.length-1;
@@ -115,9 +120,24 @@ public class wordAligner {
 				j--;
 			}
 		}
+		// Have reached top row or left side at this point or both
+		//Go up
+		if(j == 0) {
+			while(i > 0) {
+				traverseMatrix[i][j] = "^";
+				i--;
+			}
+		}
+		//Go left
+		else if(i == 0) {
+			while(j > 0) {
+				traverseMatrix[i][j] = "<-";
+				j--;
+			}
+		}
 	}
 	// use traverse matrix to make the appropriate alignments
-	void alignWords() {
+	public void alignWords() {
 		// start at string length, when insert '_' increase by one
 		int iteratorI = 1; // each time a '_' is inserted this inc by 1
 		int iteratorJ = 1; // ''
@@ -141,10 +161,13 @@ public class wordAligner {
 	}
 	
 	public int scoreAlignment(String a, String b) {
+		//System.out.print("aligning:");
+		//System.out.println(a+" and "+b);
 		if(a.equals(b)) {
 			return alignmentScore;
 		}
 		else if(isSimilar(a, b)) {
+		//	System.out.println(a+" and "+b +" are similar");
 			return similarScore;
 		}
 		return 0-alignmentScore;
@@ -155,18 +178,37 @@ public class wordAligner {
 	// have been aligned they are similar.
 	private boolean isSimilar(String a, String b) {
 		double numMisses = 0.0; // number of places in string where chars don't match
-		double max = (double)max(a.length(), b.length()); // length of the longest string
-		// TODO align the strings before iterating through them
+		
+		// not sure why but sometimes and "" gets in
+		// throw this away
+		if(a.equals("") || b.equals("")) {
+			return false;
+		}
+		
+		twoStringAligner tw = new twoStringAligner(a, b);
+		tw.doAlignment();
+		String newa = tw.getWord1Aligned();
+		String newb = tw.getWord2Aligned();
+	/*	System.out.println("aligned words*********");
+		System.out.println(newa);
+		System.out.println(newb);*/
+		if(newa.length() != newb.length()) {
+			System.out.println("error diff lenghts:");
+			System.out.println("newa is "+newa.length()+"newb is "+newb.length());
+		}
+		double max = (double)max(newa.length(), newb.length()); // length of the longest string
+		
 		for(int i = 0; i < max; i++) {
-			if(a.charAt(i) != b.charAt(i)) {
+		//	System.out.println(newa.charAt(i)+" "+newb.charAt(i));
+			if(newa.charAt(i) != newb.charAt(i)) {
 				numMisses++;
 			}
 		}
-		// > 50% of chars are the same
+		// if > 50% of chars are different they are not similar
 		if(numMisses/max >= .5) {
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	//return the max of three numbers
@@ -206,13 +248,63 @@ public class wordAligner {
 		System.out.println();
 	}
 	
-	void printAlignment() {
+	public void printAlignmentToScreen() {
 		for(int i = 0; i <words1Corrected.size(); i++) {
-			System.out.println(words1Corrected.get(i));
+			System.out.print(words1Corrected.get(i) + "\t\t");
+			System.out.print(words2Corrected.get(i));
+			System.out.println();
 		}
-		for(int i = 0; i <words2Corrected.size(); i++) {
-			System.out.println(words2Corrected.get(i));
+		System.out.println();
+	}
+	
+	//Write's alignment out to a file
+		public void printAlignmentToFile() {
+			//Write scrambled words to a file
+			String outputFileString = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments";
+			outputFileString += filename1 + filename2;
+			int totalDifferences = 0;
+		//	System.out.println(outputFileString);
+			File outputFile = new File(outputFileString);
+			try {
+				FileWriter fwr = new FileWriter(outputFile);
+				//print aligned strings when done
+				for(int i = 0; i < words1Corrected.size(); i++) {
+					fwr.write(words1Corrected.get(i)+ ",");
+					fwr.write(words2Corrected.get(i));
+					if(!(words1Corrected.get(i).equals(words2Corrected.get(i)))) {
+						fwr.write(",different");
+						totalDifferences++;
+					}
+					fwr.write("\n");
+				}
+				fwr.write("Total Diffs,");
+				fwr.write(totalDifferences+ "\n");
+				fwr.write("**********END***********");
+				fwr.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("could not find output file");
+			}
+
 		}
+	
+	// return the bottm right score
+	// this is the score of the alignment of the two strings
+	public int getAlignmentScore() {
+		return scoringMatrix[scoringMatrix.length-1][scoringMatrix[0].length-1];
+	}
+	
+	public double findPreGeneologicalCoherence() {
+		double numDiff = 0.0;
+		for(int i = 0; i < words1Corrected.size(); i++) {
+			// if chars are diff
+			if(!words1Corrected.get(i).equals(words2Corrected.get(i))) {
+				numDiff++;
+			}
+		}
+		return 100.0-numDiff/words1Corrected.size();
+
 	}
 
 }

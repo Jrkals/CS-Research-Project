@@ -3,35 +3,32 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class newAlignment {
-	static char[] string1;// = {'a', 'd', 'b', 'c', 'e'};
-	static char[] string2;// = {'a','b','c'};
-	static int[][] scoringMatrix; // holds value of alignments
-	static String[][] traverseMatrix; // holds order of best alignments
-	static ArrayList<Character> string1Corrected = new ArrayList<>(); // aligned strings
-	static ArrayList<Character> string2Corrected = new ArrayList<>();
-	static int gapPenalty = -5; // penalty for inserting '_'
-	static int alignmentScore = 3;
-	static final int SCORE = -10000; // initial value for scoring matrix
-	static int MAXSIZE; // length of longest string between string1 and string2
-	static String filename1 = "";
-	static String filename2 = "";
+public class newAlignment implements Alignment {
+	char[] string1;// = {'a', 'd', 'b', 'c', 'e'};
+	char[] string2;// = {'a','b','c'};
+	int[][] scoringMatrix; // holds value of alignments
+	String[][] traverseMatrix; // holds order of best alignments
+	ArrayList<Character> string1Corrected = new ArrayList<>(); // aligned strings
+	ArrayList<Character> string2Corrected = new ArrayList<>();
+	int MAXSIZE; // length of longest string between string1 and string2
+	String filename1 = "";
+	String filename2 = "";
 
 	public newAlignment(String file1Name, String file2Name) {
-		//Clear ArrayLists since they are static
-		string1Corrected.clear();
-		string2Corrected.clear();
-		
-		filename1 = file1Name.substring(64, 72); // just the XXX_copy.txt part of the string
-		filename2 = file2Name.substring(64, 76);
-	//	System.out.println("file1 is "+filename1+ "\nfile 2 is "+filename2);
+
+		//	System.out.println("file1 is "+filename1+ "\nfile 2 is "+filename2);
 		FileReader fr = new FileReader(file1Name);
 		FileReader fr2 = new FileReader(file2Name);
+
+		/*	filename1 = file1Name.substring(64, 72); // just the XXX_copy.txt part of the string
+		filename2 = file2Name.substring(64, 76);*/
+		filename1 = fr.getFileName();
+		filename2 = fr.getFileName();
 
 		string1 = fr.getCharacters();
 		string2 = fr2.getCharacters();
 		MAXSIZE = max(string1.length, string2.length);
-	//	System.out.println("max is "+MAXSIZE);
+		//	System.out.println("max is "+MAXSIZE);
 
 		scoringMatrix = new int[string1.length][string2.length];
 		traverseMatrix = new String[string1.length][string2.length];
@@ -61,8 +58,8 @@ public class newAlignment {
 		//create matrix of scores
 		fillScoringMatrix(string1.length-1, string2.length-1);
 		traverseScoreMatrixBackwards();
-		alignStrings();
-		printAlignment();
+		alignWords();
+		printAlignmentToFile();
 		//	double preGCoherence = findPreGeneologicalCoherence();
 		/*	System.out.printf("%.3f", preGCoherence);
 		System.out.println("% coherent");
@@ -70,11 +67,11 @@ public class newAlignment {
 	}
 
 	//Write's alignment out to a file
-	private void printAlignment() {
+	public void printAlignmentToFile() {
 		//Write scrambled words to a file
 		String outputFileString = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/";
 		outputFileString += filename1 + filename2;
-	//	System.out.println(outputFileString);
+		//	System.out.println(outputFileString);
 		File outputFile = new File(outputFileString);
 		try {
 			FileWriter fwr = new FileWriter(outputFile);
@@ -105,7 +102,7 @@ public class newAlignment {
 	}
 
 	//return the max of three numbers
-	public static int max(int a, int b, int c) {
+	public int max(int a, int b, int c) {
 		if(a > b && a > c) 
 			return a;
 		if(b > a && b > c) 
@@ -120,13 +117,13 @@ public class newAlignment {
 	}
 
 	// return the max of two numbers
-	public static int max(int a, int b) {
+	public int max(int a, int b) {
 		if(a > b)
 			return a;
 		return b;
 	}
 
-	private static int fillScoringMatrix(int i, int j){
+	public int fillScoringMatrix(int i, int j){
 		//	System.out.println("i is "+i+ " and j is "+j);
 		//	System.out.println("scoring matrix at i,j is "+scoringMatrix[i][j]);
 
@@ -182,7 +179,7 @@ public class newAlignment {
 		System.out.println();
 	}
 
-	static void traverseScoreMatrix() {
+	public void traverseScoreMatrix() {
 		//indices
 		int i,j;
 		i = j = 0;
@@ -205,9 +202,24 @@ public class newAlignment {
 				j++;
 			}
 		}
+		// Have reached top row or left side at this point or both
+		//Go up
+		if(j == 0) {
+			while(i > 0) {
+				traverseMatrix[i][j] = "^";
+				i--;
+			}
+		}
+		//Go left
+		else if(i == 0) {
+			while(j > 0) {
+				traverseMatrix[i][j] = "<-";
+				j--;
+			}
+		}
 	}
 
-	static void traverseScoreMatrixBackwards() {
+	public void traverseScoreMatrixBackwards() {
 		//indices
 		int i,j;
 		i = string1.length-1;
@@ -233,7 +245,7 @@ public class newAlignment {
 		}
 	}
 	// use traverse matrix to make the appropriate alignments
-	static void alignStrings() {
+	public void alignWords() {
 		// start at string length, when insert '_' increase by one
 		int iteratorI = 1; // each time a '_' is inserted this inc by 1
 		int iteratorJ = 1; // ''
@@ -262,7 +274,7 @@ public class newAlignment {
 		return scoringMatrix[scoringMatrix.length-1][scoringMatrix[0].length-1];
 	}
 
-	public static double findPreGeneologicalCoherence() {
+	public double findPreGeneologicalCoherence() {
 		double numDiff = 0.0;
 		for(int i = 0; i < string1Corrected.size(); i++) {
 			// if chars are diff
