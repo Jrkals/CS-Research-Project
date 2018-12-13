@@ -3,7 +3,10 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-
+/*
+ * Class which does all of the file reading and parsing of all the various
+ * text and csv files
+ */
 public class FileReader implements Macros {
 	private File file;
 	private Scanner scan;
@@ -77,6 +80,27 @@ public class FileReader implements Macros {
 		while(scan.hasNext()) {
 			String line = scan.nextLine();
 			String[] wordsInLine = line.split("\t"); // make array of individual words
+			// add each word to the word arrayList
+			for(String word: wordsInLine) {
+				words.add(word);
+			}
+		}
+		sizeOfWords = words.size();
+		//Put words into fixed size array
+		String[] wordsArray = new String[sizeOfWords];
+		for(int i = 0; i < sizeOfWords; i++) {
+			wordsArray[i] = words.get(i);
+		}
+		wordArray = wordsArray;
+		return wordArray;
+	}
+	
+	// Scan words in file using tab delimeter-
+	// used for scanning in matrix files created
+	public String[] getWordsTabAndComma() {
+		while(scan.hasNext()) {
+			String line = scan.nextLine();
+			String[] wordsInLine = line.split(",\t"); // make array of individual words
 			// add each word to the word arrayList
 			for(String word: wordsInLine) {
 				words.add(word);
@@ -172,7 +196,7 @@ public class FileReader implements Macros {
 	 * if the file read in is the alignment scores return it as a 2d array of ints 
 	 */
 	int[][] get2dArrayOfInts(){
-		String[] words = getWordsTab();
+		String[] words = getWordsTabAndComma();
 		double size = Math.sqrt(words.length);
 		int[][] rv = new int[(int)size][(int)size];
 		int count = 0;
@@ -203,6 +227,7 @@ public class FileReader implements Macros {
 		getWordsNoSkip();
 		int i = 0;
 		for(String file: wordArray) {
+		//	System.out.println(file);
 			fileList[i] = getFileName(file);
 			i++;
 		}
@@ -211,10 +236,10 @@ public class FileReader implements Macros {
 	/*
 	 * fill a hashmap with the filename associated with their index
 	 */
-	HashMap<String, Integer> returnIndexedNames(){
-		HashMap<String, Integer> numToNames = new HashMap<>();
+	HashMap<Integer, String> returnIndexedNames(){
+		HashMap<Integer, String> numToNames = new HashMap<>();
 		for(int i = 0; i < fileList.length; i++) {
-			numToNames.put(fileList[i], i);
+			numToNames.put(i, fileList[i]);
 		}
 		
 		return numToNames;

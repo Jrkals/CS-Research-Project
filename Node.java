@@ -1,4 +1,6 @@
-
+/*
+ * Node class for UPGAM tree
+ */
 public class Node {
 	double distance;
 	

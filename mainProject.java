@@ -21,14 +21,14 @@ public class mainProject implements Macros {
 		if(DO_ALIGNMENTS) {
 			d.makeDiffTable(); //
 			int[][] scores = d.getScoreTable(); 
-			d.writeAlignmentScoreTable("/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/alignmentTable1.txt");
-			d.writeWordLengths("/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/word_lengths.csv");
+			d.writeAlignmentScoreTable(ALIGNMENT_TABLE_FILE);
+			d.writeWordLengths(WORD_LENGTHS_FILE);
 		}
 		if(DO_GLOBAL_ALIGNMENT) {
-			d.writeGlobalAlingment("/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/globalAlignment.csv");
+			d.writeGlobalAlingment(GLOBAL_ALIGNMENT_FILE);
 		}
 		if(MAKE_TREE) {
-			FileReader f1 = new FileReader("/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/alignmentTable1.txt");
+			FileReader f1 = new FileReader(ALIGNMENT_TABLE_FILE);
 			int[][] scores = f1.get2dArrayOfInts();
 			/* test data from wikipedia
 			 * int[][] scores = {{0,17,21,31,23},{17,0,30,34,21},{21,30,0,28,39},
@@ -38,7 +38,7 @@ public class mainProject implements Macros {
 			treeMaker.makeTree();
 		}
 		if(FIND_ORIGINAL_TEXT) {
-			String filename = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/globalAlignment.csv";
+			String filename = GLOBAL_ALIGNMENT_FILE;
 			OriginalTextFinder otf = new OriginalTextFinder(filename);
 			String[] original = otf.findOriginalText();
 			for(String word: original) {
@@ -47,26 +47,28 @@ public class mainProject implements Macros {
 			System.out.println();
 
 			if(WRITE_ORIGINAL) {
-				String outfile = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/Original1.txt";
+				String outfile = ORIGINAL_GUESS_FILE;
 				otf.writeToFile(outfile);
 			}
 		}
 		
-		String varList = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/variantList.txt";
+		String varList = VARIANT_LIST_FILE;
 		FileReader frv = new FileReader(varList);
 		String[] filenames = frv.getFileNamesFromVariantList();
-		HashMap<String, Integer> numsForNames = frv.returnIndexedNames();
+		HashMap<Integer, String> numsForNames = frv.returnIndexedNames();
 		
-		String filename = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/100_copy.txt";
+		String filename = NAME_OF_ORIGINAL_GUESS_FILE;
 		OriginalTextFinder otf = new OriginalTextFinder();
 		String nameOfOriginal = otf.findOriginalManuscript(filename);
-		RealTreeMaker rtm = new RealTreeMaker(nameOfOriginal, filenames, numsForNames);
+		String nameOfOriginalWithoutPath = frv.getFileName(nameOfOriginal);
+		int locOriginal = otf.getLocOfOriginal();
+		RealTreeMaker rtm = new RealTreeMaker(nameOfOriginalWithoutPath, filenames, numsForNames, locOriginal);
 		rtm.makeTree();
 
 
 		if(ALIGN_ORIGINAL_WITH_ORIGINAL) {
-			String file1 = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/317_copy.txt";
-			String file2 = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/100_copy.txt";
+			String file1 = nameOfOriginal;
+			String file2 = NAME_OF_ORIGINAL_GUESS_FILE;
 			wordAligner wa = new wordAligner(file1, file2);
 			wa.doAlignment();
 		}

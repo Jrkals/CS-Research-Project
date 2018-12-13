@@ -2,7 +2,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/*
+ * Class to read alignment files
+ */
 public class AlignmentReader {
 	private File file;
 	private Scanner scan;
@@ -15,13 +17,11 @@ public class AlignmentReader {
 		try {
 			scan = new Scanner(file);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
 	// Scan words in file without skipping the first two lines
-	// used for variantList.txt
 	public String[] getWordsNoSkip() {
 		while(scan.hasNext()) {
 			String line = scan.nextLine();

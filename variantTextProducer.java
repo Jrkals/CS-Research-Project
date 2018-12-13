@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+/*
+ * A class to produce fake data by taking two texts and original and on every so many 
+ * characters making random insertions, deletions etc and writing the result out to 
+ * the output file.
+ */
 public class variantTextProducer {
 
 	public static void main(String[] args) throws IOException {

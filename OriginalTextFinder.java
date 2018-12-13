@@ -1,13 +1,19 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-
+/*
+ * class to Find the original text by first taking 
+ * a majority reading at every place in a global alignment
+ * and then comparing that reading with all of the manuscripts
+ * and picking the closest one as the original
+ */
 public class OriginalTextFinder implements Macros {
 	FileReader fr;
 	int LENGTHOFMAX = 255; // length of the longest text
 	int NUMBEROFTEXTS = 21;
 	String[] originalText = new String[LENGTHOFMAX];
 	String[][] table = new String[NUMBEROFTEXTS][LENGTHOFMAX];
+	int locOfOriginal;
 	
 	public OriginalTextFinder(String filename) {
 		fr = new FileReader(filename);
@@ -80,7 +86,7 @@ public class OriginalTextFinder implements Macros {
 	 */
 	public String findOriginalManuscript(String originalWritten) {
 		int[] scores = new int[NUMBER_OF_TEXTS];
-		FileReader frVarList = new FileReader("/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/variantList.txt");
+		FileReader frVarList = new FileReader(VARIANT_LIST_FILE);
 		String[] files = frVarList.getWordsNoSkip(); // list of manuscripts
 		String name = "";
 		
@@ -93,12 +99,12 @@ public class OriginalTextFinder implements Macros {
 		int max = Utilities.findMax(scores);
 		int loc = Utilities.findLocOfmax(max, scores);
 		name = files[loc];
+		locOfOriginal = loc;
 		System.out.println("original file is "+name);
 		return name;
 	}
 	
-	
-	
-	
-
+	public int getLocOfOriginal() {
+		return locOfOriginal;
+	}
 }

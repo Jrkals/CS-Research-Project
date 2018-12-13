@@ -1,17 +1,18 @@
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class Differ {
+public class Differ implements Macros {
 	int NUMFILES = 21;
 	int LONGESTFILE = 254;
 	double[][] coherenceTable;
 	int[][] alignmentScores;
 	String[] files;
+	// TODO set automatically
 	String[] fileNames = {"109","140","167","200","211","253","299","310",
 			"317","321","427","433","486","535","587","629","702","772","816","833","988"};
 	// default constructor
 	public Differ() {
-		FileReader frVarList = new FileReader("/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/variantList.txt");
+		FileReader frVarList = new FileReader(VARIANT_LIST_FILE);
 		files = frVarList.getWordsNoSkip(); // list of manuscripts
 		System.out.println("number of files is "+files.length);
 		// initialize arrays of scores
@@ -153,18 +154,18 @@ public class Differ {
 	public void writeGlobalAlingment(String filename) throws IOException {
 		String[][] globalAlignment = new String[NUMFILES][LONGESTFILE];
 		FileWriter fwr = new FileWriter(filename);
-		String filereaderName = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/109_";
+		String filereaderName = NAME_OF_LONGEST_FILE;
 		AlignmentReader ar1 = new AlignmentReader(filereaderName+"140.csv"); // 109_140.csv
 		globalAlignment[0] = ar1.getWordsFirstAlignment(); // get 109 only
 		// change back to the original
-		filereaderName = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/109_";
+		filereaderName = NAME_OF_LONGEST_FILE;
 		// get the alignments
 		for(int i = 1; i < NUMFILES; i++) {
 			filereaderName += fileNames[i] + ".csv"; // add the numebr next to 109_ e.g., 109_140.csv
 			AlignmentReader ar = new AlignmentReader(filereaderName);
 			globalAlignment[i] = ar.getWordsNoSkip();
 			// change back to the original
-			filereaderName = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/109_";
+			filereaderName = NAME_OF_LONGEST_FILE;
 		}
 		// write the alignments
 		for(int i = 0; i < NUMFILES; i++) {
