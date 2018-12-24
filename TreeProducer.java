@@ -1,7 +1,17 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//UPGMA tree producer
+/*
+ * Class which produces and UPGMA tree of a selection of given manuscripts.
+ * UPGMA creates a binary tree with theoretical ancestors of closely allied texts.
+ * This requires using some but not all of the texts in the collection
+ * 
+ * 
+ * 
+ * test data from wikipedia
+ * int[][] scores = {{0,17,21,31,23},{17,0,30,34,21},{21,30,0,28,39},
+ * {31,34,28,0,43},{23,21,39,43,0}};
+ */
 public class TreeProducer {
 	ArrayList<ArrayList<Integer>> table = new ArrayList<>();
 
@@ -27,6 +37,24 @@ public class TreeProducer {
 		nodeNameList.remove(nodeNameList.size()-1);
 	//	System.out.println("node name lise size: "+nodeNameList.size());
 	}
+	
+	/*
+	 * Constructor which takes a list of names and does not produce a set of ordered characters as names
+	 */
+	public TreeProducer(int[][] scores, String[] names) {
+		// copy names into list
+		for(String n:names) {
+			nodeNameList.add(n + ",");
+		}
+		// copy scores into arrayList
+		for(int i =0; i <scores.length;i++) {
+			table.add(new ArrayList<Integer>());
+			for(int j = 0; j <scores[i].length; j++) {
+				table.get(i).add(scores[i][j]);
+			}
+		}
+	}
+	
 
 	public void makeTree() {
 		//print2DArray(table);
@@ -39,7 +67,7 @@ public class TreeProducer {
 			//print2DArray(table);
 		}
 		//print2DArray(table);
-		printTree(nodeNameList.get(0));
+		//printTree(nodeNameList.get(0));
 		printTreeAsString();
 	}
 
@@ -54,7 +82,7 @@ public class TreeProducer {
 	/*
 	 * search the table for the smallest distance and return to location of it
 	 * as an int[] of size 2.
-	 *
+	 */
 	private int[] findSmallestDistance(int dimx, int dimy) {
 		int min = 100000000;
 		int[] rv = new int[2]; 
@@ -70,7 +98,7 @@ public class TreeProducer {
 		//	System.out.println("min is"+min);
 		//	System.out.println("rows are "+rv[0]+ ", "+ rv[1]);
 		return rv;
-	}*/
+	}
 	
 	/*
 	 * search the table for the largest score and return to location of it
@@ -236,23 +264,6 @@ public class TreeProducer {
 		return a;
 	}
 
-	// print a one dimensional int array
-	static void print1DArray(ArrayList<Integer> a) {
-		for (int i = 0; i < a.size(); i++) {
-			System.out.print(a.get(i)+ "\t ");
-		}
-		System.out.println();
-	}
-
-	// prints a 2d array but using printArray on each row
-	static void print2DArray(ArrayList<ArrayList<Integer>> a) {
-		System.out.println("**************************************");
-		for(int i = 0; i < a.size(); i++) {
-			print1DArray(a.get(i));
-		}
-		System.out.println("**************************************");
-	}
-
 	void printTree(String s) {
 		if(s.length() == 1) {
 			//	System.out.println(s);
@@ -267,8 +278,8 @@ public class TreeProducer {
 
 	void printTreeAsString() {
 		for(String node: tree.keySet()) {
-			System.out.print("node:");
-			System.out.println(tree.get(node).leftChild + " "+tree.get(node).rightChild);
+			System.out.print("there is a common parent between:");
+			System.out.println(tree.get(node).leftChild + " and "+tree.get(node).rightChild);
 		}
 	}
 }

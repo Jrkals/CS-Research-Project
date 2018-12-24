@@ -3,43 +3,42 @@ import java.util.HashMap;
 
 // Class for running the whole project
 public class mainProject implements Macros {
-
+	static String nameOfOriginalFile;
+	
 	public static void main(String[] args) throws IOException {
 		long currentTime = System.currentTimeMillis();
 		System.out.println("working...");
-		Differ d = new Differ();
-
-		if(TESTING) {
-			twoStringAligner tw = new twoStringAligner("notredameisgoodtoo", "notrelamistou");
-			twoStringAligner tw1 = new twoStringAligner("am", "Everett");
-			tw.doAlignment();
-			String filename1 = "/Users/justin/Dropbox/School/CS_Research/wordTest1.txt";
-			String filename2 = "/Users/justin/Dropbox/School/CS_Research/wordTest2.txt";
-			wordAligner wa = new wordAligner(filename1, filename2);
-			wa.doAlignment();
-		}
+		Differ d = new Differ(VARIANT_LIST_FILE);
 		if(DO_ALIGNMENTS) {
+			System.out.println("doing alignments...");
 			d.makeDiffTable(); //
-			int[][] scores = d.getScoreTable(); 
 			d.writeAlignmentScoreTable(ALIGNMENT_TABLE_FILE);
 			d.writeWordLengths(WORD_LENGTHS_FILE);
 		}
+		
 		if(DO_GLOBAL_ALIGNMENT) {
+			System.out.println("writing global alignment...");
 			d.writeGlobalAlingment(GLOBAL_ALIGNMENT_FILE);
 		}
-		if(MAKE_TREE) {
-			FileReader f1 = new FileReader(ALIGNMENT_TABLE_FILE);
+		
+		if(MAKE_UPGMA_TREE) {
+			System.out.println("making UPGMA tree...");
+			Differ d2 = new Differ(UPGMA_VARIANT_LIST);
+			d2.makeDiffTable();
+			d2.writeAlignmentScoreTable(UPGMA_ALIGNMENTS_FILE);
+			// get scores from alignment file
+			FileReader f1 = new FileReader(UPGMA_ALIGNMENTS_FILE);
 			int[][] scores = f1.get2dArrayOfInts();
-			/* test data from wikipedia
-			 * int[][] scores = {{0,17,21,31,23},{17,0,30,34,21},{21,30,0,28,39},
-			 *			{31,34,28,0,43},{23,21,39,43,0}};
-			 */
-			TreeProducer treeMaker = new TreeProducer(scores);
+			// make tree
+			FileReader f2 = new FileReader(UPGMA_VARIANT_LIST);
+			String[] filenames = f2.getFileNamesFromVariantList();
+			TreeProducer treeMaker = new TreeProducer(scores, filenames);
 			treeMaker.makeTree();
 		}
+		
 		if(FIND_ORIGINAL_TEXT) {
-			String filename = GLOBAL_ALIGNMENT_FILE;
-			OriginalTextFinder otf = new OriginalTextFinder(filename);
+			System.out.println("guessing the Original Text...");
+			OriginalTextFinder otf = new OriginalTextFinder(GLOBAL_ALIGNMENT_FILE);
 			String[] original = otf.findOriginalText();
 			for(String word: original) {
 				System.out.print(word+ " ");
@@ -52,22 +51,27 @@ public class mainProject implements Macros {
 			}
 		}
 		
-		String varList = VARIANT_LIST_FILE;
-		FileReader frv = new FileReader(varList);
-		String[] filenames = frv.getFileNamesFromVariantList();
-		HashMap<Integer, String> numsForNames = frv.returnIndexedNames();
+		if(MAKE_ACTUAL_TREE) {
+			System.out.println("making tree of descent and finding the original...");
+			String varList = VARIANT_LIST_FILE;
+			FileReader frv = new FileReader(varList);
+			String[] filenames = frv.getFileNamesFromVariantList();
+			HashMap<Integer, String> numsForNames = frv.returnIndexedNames();
+
+			String filename = NAME_OF_ORIGINAL_GUESS_FILE;
+			OriginalTextFinder otf = new OriginalTextFinder();
+			nameOfOriginalFile = otf.findOriginalManuscript(filename);
+			String nameOfOriginalWithoutPath = frv.getFileName(nameOfOriginalFile);
+			int locOriginal = otf.getLocOfOriginal();
+			RealTreeMaker rtm = new RealTreeMaker(nameOfOriginalWithoutPath, filenames, numsForNames, locOriginal);
+			rtm.makeTree();
+			//rtm.printTree();
+			System.out.println();
+		}
 		
-		String filename = NAME_OF_ORIGINAL_GUESS_FILE;
-		OriginalTextFinder otf = new OriginalTextFinder();
-		String nameOfOriginal = otf.findOriginalManuscript(filename);
-		String nameOfOriginalWithoutPath = frv.getFileName(nameOfOriginal);
-		int locOriginal = otf.getLocOfOriginal();
-		RealTreeMaker rtm = new RealTreeMaker(nameOfOriginalWithoutPath, filenames, numsForNames, locOriginal);
-		rtm.makeTree();
-
-
 		if(ALIGN_ORIGINAL_WITH_ORIGINAL) {
-			String file1 = nameOfOriginal;
+			System.out.println("aligning the suppossed original with the actual original...");
+			String file1 = nameOfOriginalFile;
 			String file2 = NAME_OF_ORIGINAL_GUESS_FILE;
 			wordAligner wa = new wordAligner(file1, file2);
 			wa.doAlignment();

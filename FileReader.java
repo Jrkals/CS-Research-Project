@@ -28,9 +28,9 @@ public class FileReader implements Macros {
 		}
 	}
 	// Scan words in file
+	//Scip first two lines, Hochberg formatted these with a number then a blank
+	//they are not needed
 	public String[] getWords() {
-		//Scan first two lines, Hochberg formatted these with a number then a blank
-		//they are not neede
 		scan.nextLine();
 		scan.nextLine();
 		while(scan.hasNext()) {
@@ -95,7 +95,7 @@ public class FileReader implements Macros {
 		return wordArray;
 	}
 	
-	// Scan words in file using tab delimeter-
+	// Scan words in file using comma and tab delimeter-
 	// used for scanning in matrix files created
 	public String[] getWordsTabAndComma() {
 		while(scan.hasNext()) {
@@ -120,7 +120,7 @@ public class FileReader implements Macros {
 	 * this is a csv file
 	 */
 	public String[][] getGlobalAlignmentWords(){
-		String[][] rv = new String[NUMBER_OF_TEXTS][LENGTH_OF_LONGEST_TEXT];
+		String[][] rv = new String[NUMBER_OF_TEXTS][Differ.lengthOfLongestFile];
 		for(int i = 0; i < NUMBER_OF_TEXTS; i++) {
 			String[] line = scan.nextLine().split(","); // csv file
 			line[0] = "";
@@ -208,13 +208,17 @@ public class FileReader implements Macros {
 		}
 		return rv;
 	}
-
+	/*
+	 * grab the three digit number from the filename
+	 */
 	String getFileName() {
 		int x = fileName.indexOf("copy");
 		//System.out.println("name is: "+fileName.substring(x-4, x-1));
 		return fileName.substring(x-4, x-1);
 	}
-
+	/*
+	 * grab the three digit number from the filename
+	 */
 	String getFileName(String file) {
 		int x = file.indexOf("copy");
 		//System.out.println("name is: "+fileName.substring(x-4, x-1));
@@ -241,8 +245,6 @@ public class FileReader implements Macros {
 		for(int i = 0; i < fileList.length; i++) {
 			numToNames.put(i, fileList[i]);
 		}
-		
 		return numToNames;
 	}
-
 }

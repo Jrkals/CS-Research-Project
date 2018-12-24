@@ -1,18 +1,17 @@
 
 public interface Macros {
 	
-	int NUMBER_OF_TEXTS = 22; // TODO set automatically
-	int LENGTH_OF_LONGEST_TEXT = 254; //TODO set this automatically
+	int NUMBER_OF_TEXTS = 22;
 	
 	// the following are me pretending to use the C preprocessor
-	boolean DO_ALIGNMENTS = false;
-	boolean MAKE_TREE = false;
-	boolean DO_GLOBAL_ALIGNMENT = false;
-	boolean TESTING = false;
+	boolean DO_ALIGNMENTS = true;
+	boolean MAKE_UPGMA_TREE = false;
+	boolean DO_GLOBAL_ALIGNMENT = true;
 	boolean CHECK_TIME = true;
-	boolean WRITE_ORIGINAL = false;
-	boolean ALIGN_ORIGINAL_WITH_ORIGINAL = false;
-	boolean FIND_ORIGINAL_TEXT = false;
+	boolean WRITE_ORIGINAL = true;
+	boolean ALIGN_ORIGINAL_WITH_ORIGINAL = true;
+	boolean FIND_ORIGINAL_TEXT = true;
+	boolean MAKE_ACTUAL_TREE = true;
 	
 	// the following are filepaths necessary for reading and writing to files
 	String ROOT_DIRECTORY = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/";
@@ -23,6 +22,7 @@ public interface Macros {
 	String GLOBAL_ALIGNMENT_FILE = ROOT_DIRECTORY + "Alignments/globalAlignment.csv";
 	String ORIGINAL_GUESS_FILE = ROOT_DIRECTORY + "Alignments/Original1.txt";
 	String NAME_OF_ORIGINAL_GUESS_FILE = ROOT_DIRECTORY + "100_copy.txt";
-	String NAME_OF_LONGEST_FILE = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/Alignments/109_"; // TODO set auto
+	String UPGMA_ALIGNMENTS_FILE = ROOT_DIRECTORY + "UPGMAalignmentTable.txt";
+	String UPGMA_VARIANT_LIST = ROOT_DIRECTORY + "UPGMAvariantList4.txt";
 
 }

@@ -224,7 +224,7 @@ public class RealTreeMaker implements Macros {
 			listOfPairs.remove(currentPair);
 			removeAllBadPairs();
 		} // end of while
-		tree.printTree();
+	//	tree.printTree();
 		//tree.printNodeSet();
 	}
 

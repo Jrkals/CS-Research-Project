@@ -60,6 +60,17 @@ public class wordAligner implements Alignment, Macros {
 		printAlignmentToFile();
 	}
 	/*
+	 * used for J Unit tests
+	 */
+	public void doAlignmentNoFileOutput() {
+		//create matrix of scores
+		fillScoringMatrix(words1.length-1, words2.length-1);
+		traverseScoreMatrixBackwards();
+		alignWords();
+		printAlignmentToScreen();
+	}
+	
+	/*
 	 * (non-Javadoc)
 	 * @see Alignment#fillScoringMatrix(int, int)
 	 * Dynamic Programming Algorithm to align two strings
@@ -77,7 +88,7 @@ public class wordAligner implements Alignment, Macros {
 		//Base cases
 		// either align or put a gap to start
 		if(i == 0 && j == 0) {
-			scoringMatrix[i][j] = max(scoreAlignment(words1[i], words2[j]), gapPenalty);
+			scoringMatrix[i][j] = Utilities.max(scoreAlignment(words1[i], words2[j]), gapPenalty);
 			return scoringMatrix[i][j];
 		}
 		// gap in word1 
@@ -95,7 +106,7 @@ public class wordAligner implements Alignment, Macros {
 			int a = fillScoringMatrix(i-1, j-1)+ scoreAlignment(words1[i], words2[j]);
 			int b = fillScoringMatrix(i, j-1) + gapPenalty;
 			int c = fillScoringMatrix(i-1, j) + gapPenalty;
-			scoringMatrix[i][j] = max(a,b,c);
+			scoringMatrix[i][j] = Utilities.max(a,b,c);
 			//	System.out.println("max is "+max(a,b,c));
 			
 			return scoringMatrix[i][j];
@@ -117,16 +128,16 @@ public class wordAligner implements Alignment, Macros {
 			int up = scoringMatrix[i-1][j];
 			int left = scoringMatrix[i][j-1];
 			//	System.out.println("max is" +max(diag, up, left));
-			if(max(diag, up, left) == diag) {
+			if(Utilities.max(diag, up, left) == diag) {
 				traverseMatrix[i][j] = "<-^";
 				i--;
 				j--;
 			}
-			else if(max(diag, up, left) == up) {
+			else if(Utilities.max(diag, up, left) == up) {
 				traverseMatrix[i][j] = "^";
 				i--;
 			}
-			else if(max(diag, up, left) == left) {
+			else if(Utilities.max(diag, up, left) == left) {
 				traverseMatrix[i][j] = "<-";
 				j--;
 			}
@@ -214,7 +225,7 @@ public class wordAligner implements Alignment, Macros {
 			System.out.println("error diff lenghts:");
 			System.out.println("newa is "+newa.length()+"newb is "+newb.length());
 		}
-		double max = (double)max(newa.length(), newb.length()); // length of the longest string
+		double max = (double)Utilities.max(newa.length(), newb.length()); // length of the longest string
 		
 		for(int i = 0; i < max; i++) {
 		//	System.out.println(newa.charAt(i)+" "+newb.charAt(i));
@@ -229,27 +240,6 @@ public class wordAligner implements Alignment, Macros {
 		return true;
 	}
 
-	//return the max of three numbers
-	public int max(int a, int b, int c) {
-		if(a > b && a > c) 
-			return a;
-		if(b > a && b > c) 
-			return b;
-		else {
-			// check for possible tie
-			if(c == a || c == b) {
-
-			}
-			return c;
-		}
-	}
-
-	// return the max of two numbers
-	public int max(int a, int b) {
-		if(a > b)
-			return a;
-		return b;
-	}
 	/*
 	 * prints the alignment out to the screen
 	 */
@@ -276,6 +266,9 @@ public class wordAligner implements Alignment, Macros {
 			File outputFile = new File(outputFileString);
 			try {
 				FileWriter fwr = new FileWriter(outputFile);
+				// write the names of the texts at the top
+				fwr.write(filename1+",");
+				fwr.write(filename2+"\n");
 				//print aligned strings when done
 				for(int i = 0; i < words1Corrected.size(); i++) {
 					fwr.write(words1Corrected.get(i)+ ",");

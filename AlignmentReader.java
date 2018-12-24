@@ -43,9 +43,31 @@ public class AlignmentReader {
 		return wordArray;
 	}
 	
+	
+	
 	// gets the words of the first of the pair of aligned strings
 	
 	public String[] getWordsFirstAlignment() {
+		while(scan.hasNext()) {
+			String line = scan.nextLine();
+			String[] wordsInLine = line.split(","); // make array of individual words
+			words.add(wordsInLine[0]); // add the second word, ignore the first
+		}
+		sizeOfWords = words.size();
+		//Put words into fixed size array
+		String[] wordsArray = new String[sizeOfWords];
+		for(int i = 0; i < sizeOfWords; i++) {
+			wordsArray[i] = words.get(i);
+		}
+		scan.close();
+		wordArray = wordsArray;
+		return wordArray;
+	}
+	/*
+	 * function to get words but skip first line
+	 */
+	public String[] getWordsSkipFirst() {
+		scan.nextLine();
 		while(scan.hasNext()) {
 			String line = scan.nextLine();
 			String[] wordsInLine = line.split(","); // make array of individual words
