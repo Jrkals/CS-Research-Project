@@ -123,9 +123,14 @@ public class FileReader implements Macros {
 		String[][] rv = new String[NUMBER_OF_TEXTS][Differ.lengthOfLongestFile];
 		for(int i = 0; i < NUMBER_OF_TEXTS; i++) {
 			String[] line = scan.nextLine().split(","); // csv file
-			line[0] = "";
-			//	Utilities.printArray(line);
+			//Utilities.printArray(line);
 			rv[i] = line;
+			// start at 1 to skip the first word which is the file name
+			for(int j = 1; j < line.length; j++) {
+				//System.out.println(rv[i][j]);
+				rv[i][j-1] = line[j];
+			}
+			rv[i][line.length-1] = "_"; // essentially remove last char since we are off by one b/c of the skip
 		}
 		return rv;
 	}
@@ -219,7 +224,7 @@ public class FileReader implements Macros {
 	/*
 	 * grab the three digit number from the filename
 	 */
-	String getFileName(String file) {
+	static String getFileName(String file) {
 		int x = file.indexOf("copy");
 		//System.out.println("name is: "+fileName.substring(x-4, x-1));
 		return file.substring(x-4, x-1);

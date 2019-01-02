@@ -24,8 +24,9 @@ public class Differ implements Macros {
 		fileNames = new String[numberOfFiles];
 		// fill fileNames with the number part of each file (ignore the path)
 		int k = 0;
+		// get the numbers from the whole file path
 		for(String file: files) {
-			fileNames[k] = frVarList.getFileName(file);
+			fileNames[k] = FileReader.getFileName(file);
 			k++;
 		}
 		System.out.println("number of files is "+files.length);
@@ -178,22 +179,32 @@ public class Differ implements Macros {
 	public void writeGlobalAlingment(String filename) throws IOException {
 		String longestFile = getLongest();
 		String[][] globalAlignment = new String[numberOfFiles][lengthOfLongestFile];
-		FileWriter fwr = new FileWriter(filename);
 		String filereaderName = longestFile; // alignment file
+		
 		//TODO fix the 140 issue and make it generic
 		AlignmentReader ar1 = new AlignmentReader(filereaderName+"140.csv"); // 109_140.csv
 		globalAlignment[0] = ar1.getWordsFirstAlignment(); // get 109 only
 		// change back to the original
 		filereaderName = longestFile;
+		// get the number in the name of the longest file
+		String longestFileNumber = FileReader.getFileName(longestFileName);
+		
 		// get the alignments
-		for(int i = 1; i < numberOfFiles; i++) {
+		// TODO fix the ordering of the numbers: if its not 109, then one will be skipped since
+		// the shorter number always comes first.
+		for(int i = 0; i < numberOfFiles; i++) {
+			if(fileNames[i].equals(longestFileNumber)) {
+				continue; // don't write the alignment with itself
+			}
 			filereaderName += fileNames[i] + ".csv"; // add the number next to 109_ e.g., 109_140.csv
 			AlignmentReader ar = new AlignmentReader(filereaderName);
 			globalAlignment[i] = ar.getWordsSkipFirst();
 			// change back to the original
 			filereaderName = longestFile;
 		}
-		// write the alignments
+		
+		// write the alignments to a global alignment
+		FileWriter fwr = new FileWriter(filename);
 		for(int i = 0; i < numberOfFiles; i++) {
 			fwr.write(fileNames[i]+",");
 			for(int j = 0; j < lengthOfLongestFile; j++) {
@@ -208,8 +219,8 @@ public class Differ implements Macros {
 	 * return the path of the longest file
 	 */
 	private String getLongest() {
-		FileReader fr = new FileReader(longestFileName);
-		String name = fr.getFileName(longestFileName)+ "_";
+		String name = FileReader.getFileName(longestFileName)+ "_";
+		System.out.println("longest file is "+FileReader.getFileName(longestFileName));
 		// below yields path.../Alignments/###
 		return longestFileName.substring(0, longestFileName.length()-12) + "Alignments/"+ name;
 	}

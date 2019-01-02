@@ -21,15 +21,19 @@ public class OriginalTextFinder implements Macros {
 	public OriginalTextFinder() {
 		//default constructor
 	}
-	
+	/*
+	 * Read the global alignment and pick the most common non __ reading 
+	 * at each location to produce a guess at the original text
+	 */
 	public String[] findOriginalText() {
 		readTable();
 		// iterate through table and find majority readings
-		for(int i = 0; i < table[0].length; i++) {
+		for(int i = 0; i < table[0].length; i++) { // ignore first column which is now blank
 			HashMap<String, Integer> frequencies = new HashMap<>();
-			for(int j = 0; j < table.length; j++) {
+			for(int j =0; j < table.length; j++) { 
 				String key = table[j][i];
-				// never put a gap in the final string
+				//System.out.print("k"+key+ " ");
+				// never put a gap or " " in the final string
 				if(key.equals("_")) {
 					continue;
 				}
@@ -41,7 +45,7 @@ public class OriginalTextFinder implements Macros {
 					frequencies.put(key, 0);
 				}
 			} // end of j
-			
+		//	System.out.println();
 			// store the most common reading
 			originalText[i] = findMax(frequencies);
 		} // end of i
@@ -66,16 +70,30 @@ public class OriginalTextFinder implements Macros {
 				maxString = s;
 			}
 		}
-	//	System.out.println("maxString is"+maxString);
 		return maxString;
 	}
 	
 	public void writeToFile(String filename) throws IOException {
 		FileWriter fw = new FileWriter(filename);
+		//write number and then a blank line so that this file
+		//matches the format of the other input files
+		fw.write("1000\n\n");
 		for(String word: originalText) {
 			fw.write(word+ " ");
 		}
 		fw.write("\n");
+		fw.close();
+	}
+	/*
+	 * write the most common reading on the last line of
+	 * globalAlignment.csv
+	 */
+	public void writeToGlobalAlignment() throws IOException {
+		FileWriter fw = new FileWriter(GLOBAL_ALIGNMENT_FILE, true); // set true to append not overwrite
+		fw.write("majority,");
+		for(String word: originalText) {
+			fw.append(word+",");
+		}
 		fw.close();
 	}
 	
@@ -89,7 +107,7 @@ public class OriginalTextFinder implements Macros {
 		FileReader frVarList = new FileReader(VARIANT_LIST_FILE);
 		String[] files = frVarList.getWordsNoSkip(); // list of manuscripts
 		String name = "";
-		
+		// align the original with all of the other texts
 		for(int i = 0; i < files.length; i++) {
 			wordAligner w = new wordAligner(originalWritten, files[i]);
 			w.doAlignment(); // align the two texts
@@ -100,7 +118,7 @@ public class OriginalTextFinder implements Macros {
 		int loc = Utilities.findLocOfmax(max, scores);
 		name = files[loc];
 		locOfOriginal = loc;
-		System.out.println("original file is "+name);
+		System.out.println("original file is text "+FileReader.getFileName(name));
 		return name;
 	}
 	

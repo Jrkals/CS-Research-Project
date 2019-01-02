@@ -12,6 +12,7 @@ public interface Macros {
 	boolean ALIGN_ORIGINAL_WITH_ORIGINAL = true;
 	boolean FIND_ORIGINAL_TEXT = true;
 	boolean MAKE_ACTUAL_TREE = true;
+	boolean PRINT_ACTUAL_ORIGINAL_TO_CONSOLE = false;
 	
 	// the following are filepaths necessary for reading and writing to files
 	String ROOT_DIRECTORY = "/Users/justin/Dropbox/School/CS_Research/TreeOfDocuments/copies/";
@@ -20,9 +21,9 @@ public interface Macros {
 	String ALIGNMENT_TABLE_FILE = ROOT_DIRECTORY + "alignmentTable1.txt";
 	String WORD_LENGTHS_FILE = ROOT_DIRECTORY + "word_lengths.csv";
 	String GLOBAL_ALIGNMENT_FILE = ROOT_DIRECTORY + "Alignments/globalAlignment.csv";
-	String ORIGINAL_GUESS_FILE = ROOT_DIRECTORY + "Alignments/Original1.txt";
 	String NAME_OF_ORIGINAL_GUESS_FILE = ROOT_DIRECTORY + "100_copy.txt";
 	String UPGMA_ALIGNMENTS_FILE = ROOT_DIRECTORY + "UPGMAalignmentTable.txt";
 	String UPGMA_VARIANT_LIST = ROOT_DIRECTORY + "UPGMAvariantList4.txt";
+	String ACTUAL_ORIGINAL_FILE = ROOT_DIRECTORY + "317_copy.txt";
 
 }

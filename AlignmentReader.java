@@ -46,12 +46,17 @@ public class AlignmentReader {
 	
 	
 	// gets the words of the first of the pair of aligned strings
-	
+	// skip the first line since the name of the file is on that line
+	// exit when reaching the end of the alignment (third to last line)
 	public String[] getWordsFirstAlignment() {
+		scan.nextLine(); // skip first line
 		while(scan.hasNext()) {
 			String line = scan.nextLine();
 			String[] wordsInLine = line.split(","); // make array of individual words
-			words.add(wordsInLine[0]); // add the second word, ignore the first
+			if(wordsInLine[0].equals("Total Diffs")) {
+				break;
+			}
+			words.add(wordsInLine[0]); // add the first word, ignore the second
 		}
 		sizeOfWords = words.size();
 		//Put words into fixed size array
@@ -65,13 +70,18 @@ public class AlignmentReader {
 	}
 	/*
 	 * function to get words but skip first line
+	 * exit when reaching the end of the alignment (third to last line)
 	 */
 	public String[] getWordsSkipFirst() {
-		scan.nextLine();
+		scan.nextLine(); //skip the first line
 		while(scan.hasNext()) {
 			String line = scan.nextLine();
 			String[] wordsInLine = line.split(","); // make array of individual words
-			words.add(wordsInLine[0]); // add the second word, ignore the first
+			// if reached last line exit
+			if(wordsInLine[0].equals("Total Diffs")) {
+				break;
+			}
+			words.add(wordsInLine[1]); // add the second word, ignore the first
 		}
 		sizeOfWords = words.size();
 		//Put words into fixed size array

@@ -14,11 +14,11 @@ public class mainProject implements Macros {
 			d.makeDiffTable(); //
 			d.writeAlignmentScoreTable(ALIGNMENT_TABLE_FILE);
 			d.writeWordLengths(WORD_LENGTHS_FILE);
-		}
-		
-		if(DO_GLOBAL_ALIGNMENT) {
-			System.out.println("writing global alignment...");
-			d.writeGlobalAlingment(GLOBAL_ALIGNMENT_FILE);
+			
+			if(DO_GLOBAL_ALIGNMENT) {
+				System.out.println("writing global alignment...");
+				d.writeGlobalAlingment(GLOBAL_ALIGNMENT_FILE);
+			}
 		}
 		
 		if(MAKE_UPGMA_TREE) {
@@ -43,11 +43,20 @@ public class mainProject implements Macros {
 			for(String word: original) {
 				System.out.print(word+ " ");
 			}
+			if(PRINT_ACTUAL_ORIGINAL_TO_CONSOLE) {
+				System.out.println("\nActual Original");
+				System.out.print(" ");
+				FileReader frnew = new FileReader(ACTUAL_ORIGINAL_FILE);
+				String[] realOriginal = frnew.getWords();
+				for(String word: realOriginal) {
+					System.out.print(word+ " ");
+				}
+			}
 			System.out.println();
 
 			if(WRITE_ORIGINAL) {
-				String outfile = ORIGINAL_GUESS_FILE;
-				otf.writeToFile(outfile);
+				otf.writeToFile(NAME_OF_ORIGINAL_GUESS_FILE);
+				otf.writeToGlobalAlignment();
 			}
 		}
 		
@@ -61,7 +70,7 @@ public class mainProject implements Macros {
 			String filename = NAME_OF_ORIGINAL_GUESS_FILE;
 			OriginalTextFinder otf = new OriginalTextFinder();
 			nameOfOriginalFile = otf.findOriginalManuscript(filename);
-			String nameOfOriginalWithoutPath = frv.getFileName(nameOfOriginalFile);
+			String nameOfOriginalWithoutPath = FileReader.getFileName(nameOfOriginalFile);
 			int locOriginal = otf.getLocOfOriginal();
 			RealTreeMaker rtm = new RealTreeMaker(nameOfOriginalWithoutPath, filenames, numsForNames, locOriginal);
 			rtm.makeTree();
